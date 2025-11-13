@@ -1,14 +1,10 @@
 const mongoose = require('mongoose');
 
 const requestSchema = new mongoose.Schema({
-    user: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    },
-    date: {
-        type: Date,
-        default: Date.now
     },
     title: {
         type: String,
@@ -20,12 +16,23 @@ const requestSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        default: 'pending'
+        default: 'active',
+        enum: ['active', 'completed', 'cancelled']
     },
     price: {
         type: Number,
         required: true
+    },
+    category: {
+        type: String,
+        default: 'general'
+    },
+    location: {
+        type: String,
+        default: ''
     }
-})
+}, {
+    timestamps: true
+});
 
 module.exports = mongoose.model('request', requestSchema);

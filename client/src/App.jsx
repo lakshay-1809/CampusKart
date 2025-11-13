@@ -6,6 +6,8 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import Contact  from "./pages/Contact";
 import About  from "./pages/About";
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 
 const App = () => {
     return (
@@ -17,7 +19,10 @@ const App = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/About" element={<About />} />
-                    <Route path="/contact" element={<Contact />}></Route>
+                    <Route path="/contact" element={<Contact />} />
+                    {/* Admin Routes - Secret URLs */}
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 </Routes>
             </div>
         </Router>

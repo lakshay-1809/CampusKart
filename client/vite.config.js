@@ -17,4 +17,38 @@ export default defineConfig({
     define: {
         'process.env.VITE_SERVER_URL': JSON.stringify(process.env.VITE_SERVER_URL),
     },
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                secure: false,
+            },
+            '/admin/auth': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                secure: false,
+            },
+            '/admin/users': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                secure: false,
+            },
+            '/admin/requests': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                secure: false,
+            },
+            '/admin/complaints': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                secure: false,
+            },
+            '/admin/dashboard': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                secure: false,
+            }
+        }
+    }
 });
