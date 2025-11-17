@@ -115,16 +115,49 @@ const Hero = () => {
                             </NavLink>
                         </div>
                     </div>
+                    <div className='absolute h-[60vh] w-[70vw] z-[3] top-[0px] left-[150px] m-32'>
+                        <div className=' particle
+                            bg-black opacity-[0.3] absolute w-[30px] h-[30px] rounded-[10px]
+                            transform right-[232px] rotate-45 top-[10px]
+                        '>
+                        </div><div className=' particle
+                            bg-black absolute opacity-[0.2] w-[20px] h-[20px] rounded-[5px]
+                            transform right-[50px] top-[100px] rotate-45
+                        '>
+                        </div>
+                        <div className='particle
+                            bg-black absolute opacity-[0.1] w-[37px] h-[37px] rounded-[10px]
+                            transform right-[130px] bottom-[290px] rotate-45
+                        '>
+                        </div>
+                        <div className='particle
+                            bg-black absolute opacity-[0.16] w-[40px] h-[40px] rounded-[10px]
+                            transform left-[172px] rotate-[45deg]
+                        '>
+                        </div>
+                        <div className='particle
+                            bg-black absolute opacity-[0.3] w-[20px] h-[20px] rounded-[5px]
+                            transform rotate-[70deg] left-[5px] top-[100px]
+                        '>
+                        </div>
+                        <div className='particle
+                            absolute bg-black opacity-[0.3] w-[45px] h-[45px] rounded-xl
+                            transform left-[50px] bottom-[250px] rotate-45
+                        '>
+                        </div>
+                    </div>
                 </header>
                 <section className="video h-[50vh] md:h-screen w-full p-5 md:p-[100px] flex justify-center items-center">
-                    <div className="h-full w-full flex justify-center items-center rounded-[20px] md:rounded-[40px] shadow-2xl">
+                    <div className="h-full w-full flex justify-center items-center rounded-[20px] md:rounded-[40px] shadow-2xl overflow-hidden">
                         <video
-                            className="w-full h-full object-cover object-center rounded-[20px] md:rounded-[40px]"
+                            className="w-full h-full object-cover rounded-[20px] md:rounded-[40px]"
                             autoPlay
                             loop
                             muted
+                            playsInline
                         >
                             <source src={sample} type="video/mp4" />
+                            Your browser does not support the video tag.
                         </video>
                     </div>
                 </section>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import image from './images/image.jpeg';
+import image from './images/image.png';
 import login from './images/login.jpg';
 import deliver from './images/deliver.jpg';
 import order from './images/order.jpg';
@@ -36,9 +36,9 @@ const Horizontal = () => {
             <div ref={triggerRef}>
                 <div ref={sectionRef} className='scroll-section-inner'>
                     <div className="scroll-section flex p-40">
-                        <div className='w-full py-32 px-10 '>
+                        <div className='w-full py-32 px-10 flex items-center justify-center'>
                             <img src={image} alt="pic here" className='
-                            w-full h-full object-cover object-center rounded-[20px]
+                            w-[800px] h-[600px] object-contain rounded-[20px]
                             '/>
                         </div>
                         <div className='w-full py-36 px-10'>
