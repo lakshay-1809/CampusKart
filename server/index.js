@@ -310,9 +310,14 @@ app.get("/api/user", isloggedin, async (req, res) => {
     }
 })
 app.get("/api/requests", isloggedin, async (req, res) => {
-    let user = await userModel.findById(req.user.userId);
-    let requests = await requestModel.find({ userId: user._id });
-    res.json(requests);
+    try {
+        let user = await userModel.findById(req.user.userId);
+        let requests = await requestModel.find({ userId: user._id }).populate('acceptedBy');
+        res.json(requests);
+    } catch (error) {
+        console.error('Error fetching requests:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 })
 app.post("/api/requests", isloggedin, async (req, res) => {
     let user = await userModel.findById(req.user.userId);
@@ -335,20 +340,30 @@ app.get("/api/userexist", isloggedin, async (req, res) => {
 })
 app.get("/api/allrequests", isloggedin, async (req, res) => {
     try {
-        let requests = await requestModel.find().populate('userId');
+        let requests = await requestModel.find().populate('userId').populate('acceptedBy');
         res.json(requests);
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 app.get("/api/requests/:id", isloggedin, async (req, res) => {
-    let request = await requestModel.findById(req.params.id).populate('userId');
-    if (!request) {
-        return res.status(404).send("Request not found");
+    try {
+        let request = await requestModel.findById(req.params.id).populate('userId');
+        if (!request) {
+            return res.status(404).send("Request not found");
+        }
+        request.status = "accepted";
+        request.acceptedBy = req.user._id; // Store who accepted the request
+        await request.save();
+        
+        // Populate acceptedBy field with user details
+        await request.populate('acceptedBy');
+        
+        res.json(request);
+    } catch (error) {
+        console.error('Error accepting request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-    request.status = "accepted";
-    await request.save();
-    res.json(request);
 });
 async function isloggedin(req, res, next) {
     // Check for token in cookies first (localhost)

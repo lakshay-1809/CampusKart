@@ -293,7 +293,7 @@ const Dashboard = () => {
                                         <div key={request._id} className="flex flex-wrap gap-5">
                                             <div className="min-w-[200px] md:min-w-[300px] min-h-[200px] p-6 bg-white border border-black-100 rounded-xl shadow hover:shadow-2xl transition duration-300 ease-in-out transform hover:scale-1 hover:bg-[#f2faff] hover:border-[#1d3557]">
                                                 <h5 className="mb-2 text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{request.title}</h5>
-                                                <p className="mb-1 text-sm text-gray-600 dark:text-gray-400">Accepted by: </p>
+                                                <p className="mb-1 text-sm text-gray-600 dark:text-gray-400">Accepted by: {request.acceptedBy?.name || 'Not accepted yet'}</p>
                                                 <p className="mb-3 font-normal text-gray-600 dark:text-gray-400">{request.description}</p>
                                                 <h1 className='my-5 font-bold text-xl md:text-2xl'>₹ {request.price} </h1>
                                                 <button href="#" className={`${request.status === "accepted" ? "bg-green-600" : "bg-gray-500"} rounded-[10px] border-black text-white px-7 py-3 font-bold transition ease-in-out delay-150 shadow-2xl`}>

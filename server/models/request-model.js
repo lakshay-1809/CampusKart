@@ -23,6 +23,11 @@ const requestSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    acceptedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
     category: {
         type: String,
         default: 'general'
