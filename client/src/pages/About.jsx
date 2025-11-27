@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from "@/components/Navbar"
-import top2 from './images/about us page.png';
+import top2 from './images/About us page.png';
 // import top from './images/aboutustop.jpg';
-import Lakshay from './images/lakshay.jpg';
-import Moksh from './images/Moksh.png';
+import Lakshay from './images/Lakshay.jpg';
+import Moksh from './images/moksh.png';
 import Nimish from './images/Nimish.jpg';
 import Nimarpreet from './images/Nimarpreet.jpg';
 
