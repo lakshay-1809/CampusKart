@@ -109,6 +109,7 @@ const Dashboard = () => {
     const [requests, setRequests] = useState([]);
     const [allrequests, setAllRequests] = useState([]);
     const [acceptedBy, setAcceptedBy] = useState("");
+    const [loading, setLoading] = useState(true);
     async function orderAccept(id) {
         const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/requests/${id}`, {
             method: 'GET',
@@ -155,8 +156,10 @@ const Dashboard = () => {
                 const data = await response.json();
                 console.log("User data received:", data);
                 setUserData(data);
+                setLoading(false);
             } catch (error) {
                 console.error("There was an error fetching the user data:", error);
+                setLoading(false);
                 alert("Failed to load dashboard. Redirecting to login.");
                 window.location.href = "/login";
             }
@@ -224,11 +227,15 @@ const Dashboard = () => {
         allRequests();
     }, []);
 
-    if (!userData) {
-        return <div className=''>
-            Login first
+    if (loading) {
+        return <div className='flex justify-center items-center min-h-screen'>
+            <div className='text-xl'>Loading...</div>
         </div>;
-        // window.location.href = "/login";
+    }
+
+    if (!userData) {
+        window.location.href = "/login";
+        return null;
     }
 
     return (
