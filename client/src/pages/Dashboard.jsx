@@ -112,26 +112,44 @@ const Dashboard = () => {
     useEffect(() => {
         async function fetchUserData() {
             try {
+                console.log("Fetching user data...");
+                
+                // Get token from localStorage for cross-domain requests
+                const token = localStorage.getItem('authToken');
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (token) {
+                    headers.Authorization = `Bearer ${token}`;
+                }
+                
                 const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/user`, {
                     method: "GET",
                     credentials: "include",
+                    headers: headers
                 });
+                
+                console.log("User data response status:", response.status);
                 
                 if (response.status === 403) {
                     const errorData = await response.json();
+                    console.log("Account blocked:", errorData);
                     alert(errorData.error || "Your account has been blocked.");
                     window.location.href = "/login";
                     return;
                 }
                 
                 if (!response.ok) {
+                    console.error(`User data fetch failed with status: ${response.status}`);
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const data = await response.json();
+                console.log("User data received:", data);
                 setUserData(data);
             } catch (error) {
                 console.error("There was an error fetching the user data:", error);
+                alert("Failed to load dashboard. Redirecting to login.");
                 window.location.href = "/login";
             }
         }

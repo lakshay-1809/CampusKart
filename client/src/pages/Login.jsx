@@ -31,7 +31,12 @@ export default function Component() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            if (data.user) {
+            console.log("Login response:", data);
+            if (data.status === "success" && data.user) {
+                // Store token for cross-domain requests
+                if (data.token) {
+                    localStorage.setItem('authToken', data.token);
+                }
                 setisloading(false);
                 alert("Login successful!");
                 window.location.href = "/dashboard";

@@ -39,9 +39,17 @@ export default function Component() {
             }
 
             const data = await response.json();
+            console.log("Register response:", data);
             if (data.status === "ok") {
+                // Store token for cross-domain requests
+                if (data.token) {
+                    localStorage.setItem('authToken', data.token);
+                }
                 alert("Registration successful!");
                 window.location.href = "/dashboard";
+            } else {
+                console.error("Registration failed with response:", data);
+                alert("Registration failed!");
             }
         } catch (error) {
             console.error("There was an error with the registration request:", error);

@@ -218,14 +218,18 @@ app.post("/api/register", async (req, res) => {
                     const token = jwt.sign({ email: email, userId: user._id }, process.env.JWT_KEY);
                     const isProduction = process.env.NODE_ENV === 'production';
                     
-                    res.cookie("token", token, { 
-                        httpOnly: true, 
-                        secure: isProduction,
-                        sameSite: isProduction ? 'none' : 'lax',
-                        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-                        domain: isProduction ? undefined : 'localhost'
-                    });
-                    res.send({ status: "ok" });
+                    // Set cookie for same-domain requests (localhost)
+                    if (!isProduction) {
+                        res.cookie("token", token, { 
+                            httpOnly: true, 
+                            secure: false,
+                            sameSite: 'lax',
+                            maxAge: 24 * 60 * 60 * 1000
+                        });
+                    }
+                    
+                    // Always return token in response for cross-domain compatibility
+                    res.send({ status: "ok", token: token });
                 } catch (err) {
                     console.error("Error creating user:", err);
                     res.status(500).send("Error creating user");
@@ -260,14 +264,18 @@ app.post("/api/login", async (req, res) => {
                 const token = jwt.sign({ email: user.email, userId: user._id }, process.env.JWT_KEY);
                 const isProduction = process.env.NODE_ENV === 'production';
                 
-                res.cookie("token", token, { 
-                    httpOnly: true, 
-                    secure: isProduction,
-                    sameSite: isProduction ? 'none' : 'lax',
-                    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-                    domain: isProduction ? undefined : 'localhost'
-                });
-                res.json({ status: "success", user: token });
+                // Set cookie for same-domain requests (localhost)
+                if (!isProduction) {
+                    res.cookie("token", token, { 
+                        httpOnly: true, 
+                        secure: false,
+                        sameSite: 'lax',
+                        maxAge: 24 * 60 * 60 * 1000
+                    });
+                }
+                
+                // Always return token in response for cross-domain compatibility
+                res.json({ status: "success", user: token, token: token });
             } else {
                 res.status(401).send("Invalid password");
             }
@@ -338,7 +346,17 @@ app.get("/api/requests/:id", isloggedin, async (req, res) => {
     res.json(request);
 });
 async function isloggedin(req, res, next) {
-    const token = req.cookies.token;
+    // Check for token in cookies first (localhost)
+    let token = req.cookies.token;
+    
+    // If no cookie token, check Authorization header (production)
+    if (!token) {
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            token = authHeader.substring(7);
+        }
+    }
+    
     if (!token) {
         return res.status(401).json({ error: "Access denied. No token provided." });
     }
