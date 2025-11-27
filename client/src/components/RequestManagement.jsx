@@ -40,7 +40,22 @@ const RequestManagement = () => {
                 ...(filters.status && { status: filters.status })
             });
 
-            const response = await fetch(`/admin/requests?${queryParams}`, {
+            const apiUrl = window.location.hostname === 'localhost' 
+                ? `http://localhost:5000/admin/requests?${queryParams}` 
+                : `https://campuskart-1-vv50.onrender.com/admin/requests?${queryParams}`;
+
+            // Get token from localStorage for production
+            const token = localStorage.getItem('adminToken');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (token && window.location.hostname !== 'localhost') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(apiUrl, {
+                headers,
                 credentials: 'include'
             });
 
@@ -82,8 +97,23 @@ const RequestManagement = () => {
 
     const markRequestCompleted = async (requestId) => {
         try {
-            const response = await fetch(`/admin/requests/${requestId}/complete`, {
+            const apiUrl = window.location.hostname === 'localhost' 
+                ? `http://localhost:5000/admin/requests/${requestId}/complete` 
+                : `https://campuskart-1-vv50.onrender.com/admin/requests/${requestId}/complete`;
+
+            // Get token from localStorage for production
+            const token = localStorage.getItem('adminToken');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (token && window.location.hostname !== 'localhost') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(apiUrl, {
                 method: 'PATCH',
+                headers,
                 credentials: 'include'
             });
 
@@ -107,8 +137,23 @@ const RequestManagement = () => {
         }
 
         try {
-            const response = await fetch(`/admin/requests/${requestId}`, {
+            const apiUrl = window.location.hostname === 'localhost' 
+                ? `http://localhost:5000/admin/requests/${requestId}` 
+                : `https://campuskart-1-vv50.onrender.com/admin/requests/${requestId}`;
+
+            // Get token from localStorage for production
+            const token = localStorage.getItem('adminToken');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (token && window.location.hostname !== 'localhost') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(apiUrl, {
                 method: 'DELETE',
+                headers,
                 credentials: 'include'
             });
 

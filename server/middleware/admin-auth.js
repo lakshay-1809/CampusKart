@@ -4,7 +4,16 @@ const adminModel = require('../models/admin-model');
 // Middleware to verify admin token
 const verifyAdminToken = async (req, res, next) => {
     try {
-        const token = req.cookies.adminToken;
+        // Check for token in cookies first (localhost)
+        let token = req.cookies.adminToken;
+        
+        // If no cookie token, check Authorization header (production)
+        if (!token) {
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7);
+            }
+        }
         
         if (!token) {
             return res.status(401).json({ 

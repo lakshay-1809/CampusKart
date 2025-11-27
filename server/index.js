@@ -99,16 +99,21 @@ app.post("/admin/auth/login", async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        // Set secure cookie
-        res.cookie('adminToken', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 24 * 60 * 60 * 1000 // 24 hours
-        });
+        const isProduction = process.env.NODE_ENV === 'production';
+        
+        // Set cookie for localhost
+        if (!isProduction) {
+            res.cookie('adminToken', token, {
+                httpOnly: true,
+                secure: false,
+                maxAge: 24 * 60 * 60 * 1000 // 24 hours
+            });
+        }
 
         res.json({
             success: true,
             message: "Login successful",
+            token: token, // Return token for cross-domain
             admin: {
                 id: admin._id,
                 username: admin.username,

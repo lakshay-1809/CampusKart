@@ -32,7 +32,11 @@ const AdminLogin = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('/admin/auth/login', {
+            const apiUrl = window.location.hostname === 'localhost' 
+                ? 'http://localhost:5000/admin/auth/login' 
+                : 'https://campuskart-1-vv50.onrender.com/admin/auth/login';
+
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,6 +48,11 @@ const AdminLogin = () => {
             const data = await response.json();
 
             if (data.success) {
+                // Store admin token in localStorage for production
+                if (data.token) {
+                    localStorage.setItem('adminToken', data.token);
+                }
+                
                 showToast('Login successful! Redirecting...', 'success');
                 setTimeout(() => {
                     navigate('/admin/dashboard');

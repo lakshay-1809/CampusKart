@@ -26,7 +26,22 @@ const AdminDashboard = () => {
 
     const verifyAdmin = async () => {
         try {
-            const response = await fetch('/admin/auth/verify', {
+            const apiUrl = window.location.hostname === 'localhost' 
+                ? 'http://localhost:5000/admin/auth/verify' 
+                : 'https://campuskart-1-vv50.onrender.com/admin/auth/verify';
+
+            // Get token from localStorage for production or cookies for localhost
+            const token = localStorage.getItem('adminToken');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (token && window.location.hostname !== 'localhost') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(apiUrl, {
+                headers,
                 credentials: 'include'
             });
             
@@ -35,10 +50,12 @@ const AdminDashboard = () => {
             if (data.success) {
                 setAdmin(data.admin);
             } else {
+                localStorage.removeItem('adminToken'); // Clear invalid token
                 navigate('/admin/login');
             }
         } catch (error) {
             console.error('Verification error:', error);
+            localStorage.removeItem('adminToken'); // Clear token on error
             navigate('/admin/login');
         } finally {
             setLoading(false);
@@ -47,7 +64,22 @@ const AdminDashboard = () => {
 
     const fetchDashboardStats = async () => {
         try {
-            const response = await fetch('/admin/dashboard/stats', {
+            const apiUrl = window.location.hostname === 'localhost' 
+                ? 'http://localhost:5000/admin/dashboard/stats' 
+                : 'https://campuskart-1-vv50.onrender.com/admin/dashboard/stats';
+
+            // Get token from localStorage for production
+            const token = localStorage.getItem('adminToken');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (token && window.location.hostname !== 'localhost') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(apiUrl, {
+                headers,
                 credentials: 'include'
             });
             
@@ -63,17 +95,35 @@ const AdminDashboard = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch('/admin/auth/logout', {
+            const apiUrl = window.location.hostname === 'localhost' 
+                ? 'http://localhost:5000/admin/auth/logout' 
+                : 'https://campuskart-1-vv50.onrender.com/admin/auth/logout';
+
+            // Get token from localStorage for production
+            const token = localStorage.getItem('adminToken');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (token && window.location.hostname !== 'localhost') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(apiUrl, {
                 method: 'POST',
+                headers,
                 credentials: 'include'
             });
             
             if (response.ok) {
+                localStorage.removeItem('adminToken'); // Clear admin token
                 showToast('Logged out successfully', 'success');
                 setTimeout(() => navigate('/admin/login'), 1000);
             }
         } catch (error) {
             console.error('Logout error:', error);
+            localStorage.removeItem('adminToken'); // Clear token on error
+            setTimeout(() => navigate('/admin/login'), 1000);
         }
     };
 
