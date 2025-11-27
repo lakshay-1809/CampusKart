@@ -19,6 +19,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Hero = () => {
     useGSAP(() => {
+        // Card animations - simple fade and scale on scroll
         gsap.utils.toArray('.card').forEach((card) => {
             gsap.to(card, {
                 scale: 0.8,
@@ -26,44 +27,42 @@ const Hero = () => {
                 scrollTrigger: {
                     trigger: card,
                     start: 'top 20%',
-                    bottom: 'top 20%',
+                    end: 'bottom 20%',
                     scrub: true,
                 }
             });
         });
-        gsap.to('.footer', {
+        
+        // Footer background change
+        gsap.to('.footer, .navbar', {
             backgroundColor: 'black',
             color: 'white',
-            transition: 'all 0.5s',
             scrollTrigger: {
                 trigger: '.footer',
                 start: 'top 10%',
                 end: 'top 10%',
-                scrub: true,
+                scrub: 1,
             },
         });
-        gsap.to('.navbar', {
-            backgroundColor: 'black',
-            color: 'white',
-            transition: 'all 0.5s',
-            scrollTrigger: {
-                trigger: '.footer',
-                start: 'top 10%',
-                end: 'top 10%',
-                scrub: true,
-            },
-        });
-    });
+    }, []);
 
     useEffect(() => {
-        const lenis = new Lenis();
+        // Initialize Lenis smooth scrolling
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+        
         function raf(time) {
             lenis.raf(time);
             requestAnimationFrame(raf);
         }
-        requestAnimationFrame(raf);
+        
+        const rafId = requestAnimationFrame(raf);
+        
+        // Particle mouse interaction
         const particles = document.querySelectorAll('.particle');
-
+        
         const handleMouseMove = (event) => {
             const { clientX, clientY } = event;
             particles.forEach((particle) => {
@@ -80,9 +79,18 @@ const Hero = () => {
         };
 
         document.addEventListener('mousemove', handleMouseMove);
+        
+        // Refresh ScrollTrigger after everything is loaded
+        const timer = setTimeout(() => {
+            ScrollTrigger.refresh();
+        }, 100);
 
         return () => {
             document.removeEventListener('mousemove', handleMouseMove);
+            cancelAnimationFrame(rafId);
+            lenis.destroy();
+            clearTimeout(timer);
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill());
         };
     }, []);
 
