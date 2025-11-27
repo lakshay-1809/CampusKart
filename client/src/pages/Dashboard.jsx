@@ -116,6 +116,14 @@ const Dashboard = () => {
                     method: "GET",
                     credentials: "include",
                 });
+                
+                if (response.status === 403) {
+                    const errorData = await response.json();
+                    alert(errorData.error || "Your account has been blocked.");
+                    window.location.href = "/login";
+                    return;
+                }
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -124,6 +132,7 @@ const Dashboard = () => {
                 setUserData(data);
             } catch (error) {
                 console.error("There was an error fetching the user data:", error);
+                window.location.href = "/login";
             }
         }
         async function getRequest() {
@@ -140,6 +149,7 @@ const Dashboard = () => {
                 credentials: 'include'
             })
             const data = await response.json();
+            console.log('All requests data:', data);
             setAllRequests(data);
         }
 
@@ -172,26 +182,31 @@ const Dashboard = () => {
                 <h1 className='font-bold text-3xl md:text-5xl my-5'>{userData.type === "dayScholar" ? "Active" : "Your"} Orders</h1>
                 {userData.type === "dayScholar" ? (
                     <div className="flex flex-wrap gap-5">
-                        {allrequests.slice().reverse().map((request) => {
-                            return (
-                                request.status != "Accepted" && (
-                                    <div key={request._id} className="flex flex-wrap gap-5">
-                                        <div className="min-w-[200px] md:min-w-[300px] min-h-[200px] p-6 bg-[#eceff1] border border-black-100 rounded-xl shadow hover:shadow-2xl transition duration-300 ease-in-out transform  hover:scale-[1.06] hover:bg-white
-                                    ">
-                                            <h5 className="mb-2 text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{request.title}</h5>
-                                            <p className="mb-1 text-sm text-gray-600 dark:text-gray-400">Requested by: {request.user.name}</p>
-                                            <p className="mb-3 font-normal text-gray-600 dark:text-gray-400">{request.description}</p>
-                                            <h1 className='my-5 font-bold text-xl md:text-2xl'>₹ {request.price} </h1>
-                                            <button href="#" className="bg-green-500 rounded-[10px] border-black text-white px-7 py-3 font-bold transition ease-in-out delay-150 shadow-2xl hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                                onClick={() => { orderAccept(request._id); location.reload(); }}>
-                                                Accept
-                                            </button>
+                        {allrequests.length === 0 ? (
+                            <div className="w-full text-center py-10">
+                                <p className="text-gray-500 text-lg">No active requests available at the moment.</p>
+                            </div>
+                        ) : (
+                            allrequests.slice().reverse().map((request) => {
+                                return (
+                                    request.status != "accepted" && (
+                                        <div key={request._id} className="flex flex-wrap gap-5">
+                                            <div className="min-w-[200px] md:min-w-[300px] min-h-[200px] p-6 bg-[#eceff1] border border-black-100 rounded-xl shadow hover:shadow-2xl transition duration-300 ease-in-out transform  hover:scale-[1.06] hover:bg-white
+                                        ">
+                                                <h5 className="mb-2 text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{request.title}</h5>
+                                                <p className="mb-1 text-sm text-gray-600 dark:text-gray-400">Requested by: {request.userId?.name || 'Unknown'}</p>
+                                                <p className="mb-3 font-normal text-gray-600 dark:text-gray-400">{request.description}</p>
+                                                <h1 className='my-5 font-bold text-xl md:text-2xl'>₹ {request.price} </h1>
+                                                <button href="#" className="bg-green-500 rounded-[10px] border-black text-white px-7 py-3 font-bold transition ease-in-out delay-150 shadow-2xl hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                                    onClick={() => { orderAccept(request._id); location.reload(); }}>
+                                                    Accept
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )
                                 )
-
-                            )
-                        })}
+                            })
+                        )}
                     </div>
                 ) : (
                     <>
@@ -208,7 +223,7 @@ const Dashboard = () => {
                                                 <p className="mb-1 text-sm text-gray-600 dark:text-gray-400">Accepted by: </p>
                                                 <p className="mb-3 font-normal text-gray-600 dark:text-gray-400">{request.description}</p>
                                                 <h1 className='my-5 font-bold text-xl md:text-2xl'>₹ {request.price} </h1>
-                                                <button href="#" className={`${request.status === "Accepted" ? "bg-green-600" : "bg-gray-500"} rounded-[10px] border-black text-white px-7 py-3 font-bold transition ease-in-out delay-150 shadow-2xl`}>
+                                                <button href="#" className={`${request.status === "accepted" ? "bg-green-600" : "bg-gray-500"} rounded-[10px] border-black text-white px-7 py-3 font-bold transition ease-in-out delay-150 shadow-2xl`}>
                                                     {request.status}
                                                 </button>
                                             </div>

@@ -224,6 +224,14 @@ app.post("/api/login", async (req, res) => {
         let user = await userModel.findOne({ email: email });
         if (!user) return res.status(500).send("User not found");
 
+        // Check if user account is active
+        if (!user.isActive) {
+            return res.status(403).json({ 
+                error: "Account has been blocked. Please contact support.",
+                status: "blocked" 
+            });
+        }
+
         bcrypt.compare(password, user.password, (err, result) => {
             if (err) {
                 console.error("Error comparing passwords:", err);
@@ -298,11 +306,11 @@ app.get("/api/requests/:id", isloggedin, async (req, res) => {
     if (!request) {
         return res.status(404).send("Request not found");
     }
-    request.status = "Accepted";
+    request.status = "accepted";
     await request.save();
     res.json(request);
 });
-function isloggedin(req, res, next) {
+async function isloggedin(req, res, next) {
     const token = req.cookies.token;
     if (!token) {
         return res.status(401).json({ error: "Access denied. No token provided." });
@@ -310,6 +318,18 @@ function isloggedin(req, res, next) {
 
     try {
         const data = jwt.verify(token, process.env.JWT_KEY);
+        
+        // Check if user is active
+        const user = await userModel.findById(data.userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+        
+        if (!user.isActive) {
+            res.clearCookie("token");
+            return res.status(403).json({ error: "Account has been blocked. Please contact support." });
+        }
+        
         req.user = data;
         next();
     } catch (error) {

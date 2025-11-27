@@ -17,7 +17,7 @@ const requestSchema = new mongoose.Schema({
     status: {
         type: String,
         default: 'active',
-        enum: ['active', 'completed', 'cancelled']
+        enum: ['active', 'completed', 'cancelled', 'accepted']
     },
     price: {
         type: Number,

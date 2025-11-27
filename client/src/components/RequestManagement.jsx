@@ -194,6 +194,7 @@ const RequestManagement = () => {
                                 <SelectItem value="active">Active</SelectItem>
                                 <SelectItem value="completed">Completed</SelectItem>
                                 <SelectItem value="cancelled">Cancelled</SelectItem>
+                                <SelectItem value="accepted">Accepted</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -250,7 +251,7 @@ const RequestManagement = () => {
                                             onClick={() => deleteRequest(request._id, request.title)}
                                             variant="destructive"
                                             size="sm"
-                                            className="text-red-600"
+                                            className="text-white"
                                         >
                                             Delete
                                         </Button>
