@@ -216,7 +216,15 @@ app.post("/api/register", async (req, res) => {
                         type
                     });
                     const token = jwt.sign({ email: email, userId: user._id }, process.env.JWT_KEY);
-                    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+                    const isProduction = process.env.NODE_ENV === 'production';
+                    
+                    res.cookie("token", token, { 
+                        httpOnly: true, 
+                        secure: isProduction,
+                        sameSite: isProduction ? 'none' : 'lax',
+                        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+                        domain: isProduction ? undefined : 'localhost'
+                    });
                     res.send({ status: "ok" });
                 } catch (err) {
                     console.error("Error creating user:", err);
@@ -250,7 +258,15 @@ app.post("/api/login", async (req, res) => {
             }
             if (result) {
                 const token = jwt.sign({ email: user.email, userId: user._id }, process.env.JWT_KEY);
-                res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+                const isProduction = process.env.NODE_ENV === 'production';
+                
+                res.cookie("token", token, { 
+                    httpOnly: true, 
+                    secure: isProduction,
+                    sameSite: isProduction ? 'none' : 'lax',
+                    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+                    domain: isProduction ? undefined : 'localhost'
+                });
                 res.json({ status: "success", user: token });
             } else {
                 res.status(401).send("Invalid password");
