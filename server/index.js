@@ -30,13 +30,21 @@ mongoose.connection.on("error", (err) => {
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://campuskart1.netlify.app" // Your Netlify URL
+        "https://campuskart1.netlify.app",
+        "https://campuskart1.netlify.app/"
     ],
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', message: 'Server is running' });
+});
 
 // ===== ADMIN AUTHENTICATION ROUTES =====
 
