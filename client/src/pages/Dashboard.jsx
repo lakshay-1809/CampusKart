@@ -26,14 +26,22 @@ function DialogDemo() {
     };
     const postRequest = async (e) => {
         e.preventDefault();
+        
+        const token = localStorage.getItem('authToken');
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+        
         const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/requests`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: headers,
             credentials: 'include',
             body: JSON.stringify(formData),
         });
+        
         if (response.ok) {
             alert('Request submitted successfully');
             location.reload();
@@ -154,21 +162,61 @@ const Dashboard = () => {
             }
         }
         async function getRequest() {
-            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/requests`, {
-                method: 'GET',
-                credentials: 'include'
-            })
-            const data = await response.json();
-            setRequests(data);
+            try {
+                const token = localStorage.getItem('authToken');
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (token) {
+                    headers.Authorization = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/requests`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: headers
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    setRequests(Array.isArray(data) ? data : []);
+                } else {
+                    console.error('Failed to fetch requests:', response.status);
+                    setRequests([]);
+                }
+            } catch (error) {
+                console.error('Error fetching requests:', error);
+                setRequests([]);
+            }
         }
         async function allRequests() {
-            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/allrequests`, {
-                method: 'GET',
-                credentials: 'include'
-            })
-            const data = await response.json();
-            console.log('All requests data:', data);
-            setAllRequests(data);
+            try {
+                const token = localStorage.getItem('authToken');
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (token) {
+                    headers.Authorization = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/allrequests`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: headers
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('All requests data:', data);
+                    setAllRequests(Array.isArray(data) ? data : []);
+                } else {
+                    console.error('Failed to fetch all requests:', response.status);
+                    setAllRequests([]);
+                }
+            } catch (error) {
+                console.error('Error fetching all requests:', error);
+                setAllRequests([]);
+            }
         }
 
         fetchUserData();
@@ -205,7 +253,7 @@ const Dashboard = () => {
                                 <p className="text-gray-500 text-lg">No active requests available at the moment.</p>
                             </div>
                         ) : (
-                            allrequests.slice().reverse().map((request) => {
+                            (allrequests || []).slice().reverse().map((request) => {
                                 return (
                                     request.status != "accepted" && (
                                         <div key={request._id} className="flex flex-wrap gap-5">
@@ -233,7 +281,7 @@ const Dashboard = () => {
                         </div>
                         <div className="flex flex-wrap gap-5">
                             {
-                                requests.slice().reverse().map((request) => {
+                                (requests || []).slice().reverse().map((request) => {
                                     return (
                                         <div key={request._id} className="flex flex-wrap gap-5">
                                             <div className="min-w-[200px] md:min-w-[300px] min-h-[200px] p-6 bg-white border border-black-100 rounded-xl shadow hover:shadow-2xl transition duration-300 ease-in-out transform hover:scale-1 hover:bg-[#f2faff] hover:border-[#1d3557]">
