@@ -14,36 +14,50 @@ import fastandreliabledelivery from './images/fast and reliable delivery.png';
 import profile from './images/profile.png';
 import sample from './video/sample.mp4';
 
-gsap.registerPlugin(useGSAP);
-gsap.registerPlugin(ScrollTrigger);
+// Register GSAP plugins
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const Hero = () => {
     useGSAP(() => {
-        // Card animations - simple fade and scale on scroll
-        gsap.utils.toArray('.card').forEach((card) => {
-            gsap.to(card, {
-                scale: 0.8,
-                opacity: 0,
-                scrollTrigger: {
-                    trigger: card,
-                    start: 'top 20%',
-                    end: 'bottom 20%',
-                    scrub: true,
-                }
+        // Wait for DOM to be fully ready
+        const initAnimations = () => {
+            // Card animations - simple fade and scale on scroll
+            const cards = gsap.utils.toArray('.card');
+            cards.forEach((card) => {
+                gsap.to(card, {
+                    scale: 0.8,
+                    opacity: 0,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 20%',
+                        end: 'bottom 20%',
+                        scrub: true,
+                    }
+                });
             });
-        });
-        
-        // Footer background change
-        gsap.to('.footer, .navbar', {
-            backgroundColor: 'black',
-            color: 'white',
-            scrollTrigger: {
-                trigger: '.footer',
-                start: 'top 10%',
-                end: 'top 10%',
-                scrub: 1,
-            },
-        });
+            
+            // Footer background change
+            const footer = document.querySelector('.footer');
+            const navbar = document.querySelector('.navbar');
+            
+            if (footer && navbar) {
+                gsap.to([footer, navbar], {
+                    backgroundColor: 'black',
+                    color: 'white',
+                    scrollTrigger: {
+                        trigger: footer,
+                        start: 'top 10%',
+                        end: 'top 10%',
+                        scrub: 1,
+                    },
+                });
+            }
+            
+            ScrollTrigger.refresh();
+        };
+
+        // Initialize animations after a small delay
+        setTimeout(initAnimations, 100);
     }, []);
 
     useEffect(() => {
