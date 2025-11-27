@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 const Navbar = ({ className }) => {
     const [isloggedin, setIsloggedin] = useState(false);
+    const [authLoading, setAuthLoading] = useState(true);
     const handleLogout = async () => {
         try {
             // Clear token from localStorage
@@ -49,9 +50,11 @@ const Navbar = ({ className }) => {
                 } else {
                     setIsloggedin(false);
                 }
+                setAuthLoading(false);
             } catch (error) {
                 console.error(error);
                 setIsloggedin(false);
+                setAuthLoading(false);
             }
         };
         checkLogin();
@@ -66,7 +69,11 @@ const Navbar = ({ className }) => {
                 <NavLink to="/contact" className='hover-underline-animation center'>Contact</NavLink>
             </div>
             <div className='nav2 flex gap-2'>
-                {isloggedin ? (
+                {authLoading ? (
+                    <div className='px-7 py-3'>
+                        {/* Empty space while loading to prevent layout shift */}
+                    </div>
+                ) : isloggedin ? (
                     <>
                         <img src="" alt="" />
                         <button
