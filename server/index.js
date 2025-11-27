@@ -346,20 +346,45 @@ app.get("/api/allrequests", isloggedin, async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+// GET endpoint for fetching single request
 app.get("/api/requests/:id", isloggedin, async (req, res) => {
+    try {
+        let request = await requestModel.findById(req.params.id).populate('userId').populate('acceptedBy');
+        if (!request) {
+            return res.status(404).json({ error: "Request not found" });
+        }
+        res.json(request);
+    } catch (error) {
+        console.error('Error fetching request:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// POST endpoint for accepting requests
+app.post("/api/requests/:id/accept", isloggedin, async (req, res) => {
     try {
         let request = await requestModel.findById(req.params.id).populate('userId');
         if (!request) {
-            return res.status(404).send("Request not found");
+            return res.status(404).json({ error: "Request not found" });
         }
+        
+        // Check if request is already accepted
+        if (request.status === "accepted") {
+            return res.status(400).json({ error: "Request already accepted" });
+        }
+        
         request.status = "accepted";
-        request.acceptedBy = req.user._id; // Store who accepted the request
+        request.acceptedBy = req.user.userId; // Store who accepted the request
         await request.save();
         
         // Populate acceptedBy field with user details
         await request.populate('acceptedBy');
         
-        res.json(request);
+        res.json({ 
+            success: true, 
+            message: "Request accepted successfully", 
+            request: request 
+        });
     } catch (error) {
         console.error('Error accepting request:', error);
         res.status(500).json({ error: 'Internal Server Error' });

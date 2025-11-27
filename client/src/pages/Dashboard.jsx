@@ -111,12 +111,40 @@ const Dashboard = () => {
     const [acceptedBy, setAcceptedBy] = useState("");
     const [loading, setLoading] = useState(true);
     async function orderAccept(id) {
-        const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/requests/${id}`, {
-            method: 'GET',
-            credentials: 'include'
-        })
-        const data = await response.json();
-        setAcceptedBy(userData.name);
+        try {
+            const token = localStorage.getItem('authToken');
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers.Authorization = `Bearer ${token}`;
+            }
+
+            const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/requests/${id}/accept`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: headers
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Update local state to immediately reflect the change
+                setAllRequests(prevRequests => 
+                    prevRequests.map(request => 
+                        request._id === id 
+                            ? { ...request, status: 'accepted', acceptedBy: userData }
+                            : request
+                    )
+                );
+                alert('Request accepted successfully!');
+            } else {
+                alert(data.error || 'Failed to accept request');
+            }
+        } catch (error) {
+            console.error('Error accepting request:', error);
+            alert('Error accepting request');
+        }
     }
     useEffect(() => {
         async function fetchUserData() {
@@ -260,25 +288,23 @@ const Dashboard = () => {
                                 <p className="text-gray-500 text-lg">No active requests available at the moment.</p>
                             </div>
                         ) : (
-                            (allrequests || []).slice().reverse().map((request) => {
-                                return (
-                                    request.status != "accepted" && (
-                                        <div key={request._id} className="flex flex-wrap gap-5">
-                                            <div className="min-w-[200px] md:min-w-[300px] min-h-[200px] p-6 bg-[#eceff1] border border-black-100 rounded-xl shadow hover:shadow-2xl transition duration-300 ease-in-out transform  hover:scale-[1.06] hover:bg-white
+                            (allrequests || [])
+                                .filter(request => request.status !== "accepted") // Filter out accepted requests
+                                .slice().reverse().map((request) => (
+                                    <div key={request._id} className="flex flex-wrap gap-5">
+                                        <div className="min-w-[200px] md:min-w-[300px] min-h-[200px] p-6 bg-[#eceff1] border border-black-100 rounded-xl shadow hover:shadow-2xl transition duration-300 ease-in-out transform  hover:scale-[1.06] hover:bg-white
                                         ">
-                                                <h5 className="mb-2 text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{request.title}</h5>
-                                                <p className="mb-1 text-sm text-gray-600 dark:text-gray-400">Requested by: {request.userId?.name || 'Unknown'}</p>
-                                                <p className="mb-3 font-normal text-gray-600 dark:text-gray-400">{request.description}</p>
-                                                <h1 className='my-5 font-bold text-xl md:text-2xl'>₹ {request.price} </h1>
-                                                <button href="#" className="bg-green-500 rounded-[10px] border-black text-white px-7 py-3 font-bold transition ease-in-out delay-150 shadow-2xl hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                                                    onClick={() => { orderAccept(request._id); location.reload(); }}>
-                                                    Accept
-                                                </button>
-                                            </div>
+                                            <h5 className="mb-2 text-xl md:text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{request.title}</h5>
+                                            <p className="mb-1 text-sm text-gray-600 dark:text-gray-400">Requested by: {request.userId?.name || 'Unknown'}</p>
+                                            <p className="mb-3 font-normal text-gray-600 dark:text-gray-400">{request.description}</p>
+                                            <h1 className='my-5 font-bold text-xl md:text-2xl'>₹ {request.price} </h1>
+                                            <button href="#" className="bg-green-500 rounded-[10px] border-black text-white px-7 py-3 font-bold transition ease-in-out delay-150 shadow-2xl hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                                onClick={() => orderAccept(request._id)}>
+                                                Accept
+                                            </button>
                                         </div>
-                                    )
-                                )
-                            })
+                                    </div>
+                                ))
                         )}
                     </div>
                 ) : (
