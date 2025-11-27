@@ -4,31 +4,54 @@ const Navbar = ({ className }) => {
     const [isloggedin, setIsloggedin] = useState(false);
     const handleLogout = async () => {
         try {
+            // Clear token from localStorage
+            localStorage.removeItem('authToken');
+            
             const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/logout`, {
                 method: "GET",
                 credentials: "include",
             });
+            
+            setIsloggedin(false);
             alert("Logged out successfully!");
-            window.location.href = "/login";
+            window.location.href = "/";
         } catch (error) {
             console.error(error);
+            // Still clear token and logout locally even if server request fails
+            setIsloggedin(false);
+            window.location.href = "/";
         }
     };
     useEffect(() => {
         const checkLogin = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/userexist`, {
-                    method: "GET",
-                    credentials: "include",
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.status === "ok") {
+                // Check if user has token in localStorage
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    const headers = {
+                        'Content-Type': 'application/json'
+                    };
+                    headers.Authorization = `Bearer ${token}`;
+                    
+                    const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/user`, {
+                        method: "GET",
+                        credentials: "include",
+                        headers: headers
+                    });
+                    
+                    if (response.ok) {
                         setIsloggedin(true);
+                    } else {
+                        // Token is invalid, remove it
+                        localStorage.removeItem('authToken');
+                        setIsloggedin(false);
                     }
+                } else {
+                    setIsloggedin(false);
                 }
             } catch (error) {
                 console.error(error);
+                setIsloggedin(false);
             }
         };
         checkLogin();
