@@ -28,7 +28,10 @@ mongoose.connection.on("error", (err) => {
     console.error("Error connecting to MongoDB:", err);
 });
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: [
+        "http://localhost:5173",
+        "https://campuskart1.netlify.app" // Your Netlify URL
+    ],
     credentials: true
 }));
 app.use(cookieParser());
